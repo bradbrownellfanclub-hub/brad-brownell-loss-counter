@@ -1,6 +1,6 @@
 
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageEnhance
 
 photo_path = Path("assets/brad.jpg")
 
@@ -9,18 +9,35 @@ if not photo_path.exists():
 
 photo = Image.open(photo_path).convert("RGB")
 
-# Preserve the entire photograph.
-# Fit it inside the canvas without cropping.
 width, height = 1200, 675
 
-photo.thumbnail((width, height), Image.Resampling.LANCZOS)
+# Create a full-bleed background using the photograph
+background = photo.resize(
+    (width, height),
+    Image.Resampling.LANCZOS
+)
 
-canvas = Image.new("RGB", (width, height), "white")
+background = background.filter(
+    ImageFilter.GaussianBlur(radius=30)
+)
 
-x = (width - photo.width) // 2
-y = (height - photo.height) // 2
+# Darken background slightly
+background = ImageEnhance.Brightness(background).enhance(0.65)
 
-canvas.paste(photo, (x, y))
+canvas = background.copy()
+
+# Preserve the entire original photograph
+foreground = photo.copy()
+foreground.thumbnail(
+    (width, height),
+    Image.Resampling.LANCZOS
+)
+
+# Center photograph over blurred background
+x = (width - foreground.width) // 2
+y = (height - foreground.height) // 2
+
+canvas.paste(foreground, (x, y))
 
 draw = ImageDraw.Draw(canvas)
 
@@ -43,7 +60,6 @@ draw.text(
     fill="black"
 )
 
-canvas.save("test_graphic.png", quality=95)
+canvas.save("test_graphic.png")
 
-print("Graphic generated without cropping!")
-
+print("Full-bleed graphic generated!")
