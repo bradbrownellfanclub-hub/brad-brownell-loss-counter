@@ -1,48 +1,49 @@
 
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageFont
 
 photo_path = Path("assets/brad.jpg")
 
 if not photo_path.exists():
     raise FileNotFoundError("Missing assets/brad.jpg")
 
-# Full-bleed photograph
+photo = Image.open(photo_path).convert("RGB")
+
+# Preserve the entire photograph.
+# Fit it inside the canvas without cropping.
 width, height = 1200, 675
 
-photo = Image.open(photo_path).convert("RGB")
-canvas = ImageOps.fit(photo, (width, height))
+photo.thumbnail((width, height), Image.Resampling.LANCZOS)
+
+canvas = Image.new("RGB", (width, height), "white")
+
+x = (width - photo.width) // 2
+y = (height - photo.height) // 2
+
+canvas.paste(photo, (x, y))
 
 draw = ImageDraw.Draw(canvas)
 
 font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-number_font = ImageFont.truetype(font_path, 190)
+font = ImageFont.truetype(font_path, 175)
 
 number = "207"
 
-# Center number horizontally near the bottom
-bounds = draw.textbbox(
-    (0, 0),
-    number,
-    font=number_font,
-    stroke_width=9
-)
-
+bounds = draw.textbbox((0, 0), number, font=font)
 text_width = bounds[2] - bounds[0]
 text_height = bounds[3] - bounds[1]
 
-x = (width - text_width) // 2 - bounds[0]
-y = height - text_height - 45 - bounds[1]
+text_x = (width - text_width) // 2 - bounds[0]
+text_y = height - text_height - 35 - bounds[1]
 
 draw.text(
-    (x, y),
+    (text_x, text_y),
     number,
-    font=number_font,
-    fill="white",
-    stroke_width=9,
-    stroke_fill="black"
+    font=font,
+    fill="black"
 )
 
 canvas.save("test_graphic.png", quality=95)
 
-print("Minimal Brownell graphic generated!")
+print("Graphic generated without cropping!")
+
