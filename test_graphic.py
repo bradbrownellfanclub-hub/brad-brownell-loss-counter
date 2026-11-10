@@ -45,7 +45,7 @@ canvas = photo.resize(
 draw = ImageDraw.Draw(canvas)
 
 font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-font = ImageFont.truetype(font_path, 175)
+font = ImageFont.truetype(font_path, 220)
 
 number = "207"
 
@@ -70,7 +70,7 @@ draw.text(
     number,
     font=font,
     fill="white",
-    stroke_width=7,
+    stroke_width=9,
     stroke_fill="black"
 )
 
