@@ -1,0 +1,30 @@
+
+name: Test Brownell Graphic
+
+on:
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+
+      - name: Install Pillow
+        run: pip install Pillow
+
+      - name: Generate graphic
+        run: python test_graphic.py
+
+      - name: Upload graphic
+        uses: actions/upload-artifact@v4
+        with:
+          name: brownell-test-graphic
+          path: test_graphic.png
