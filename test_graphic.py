@@ -7,38 +7,42 @@ photo_path = Path("assets/brad.jpg")
 if not photo_path.exists():
     raise FileNotFoundError("Missing assets/brad.jpg")
 
+# Full-bleed photograph
 width, height = 1200, 675
 
-canvas = Image.new("RGB", (width, height), (245, 102, 0))
-
 photo = Image.open(photo_path).convert("RGB")
-portrait = ImageOps.fit(photo, (590, height))
-canvas.paste(portrait, (0, 0))
+canvas = ImageOps.fit(photo, (width, height))
 
 draw = ImageDraw.Draw(canvas)
 
 font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-
-title = ImageFont.truetype(font_path, 42)
-number_font = ImageFont.truetype(font_path, 180)
-subtitle = ImageFont.truetype(font_path, 34)
-
-draw.text((620, 65), "CLEMSON BASKETBALL",
-          font=title, fill="white")
+number_font = ImageFont.truetype(font_path, 190)
 
 number = "207"
-bounds = draw.textbbox((0, 0), number, font=number_font)
-number_width = bounds[2] - bounds[0]
 
-draw.text((620 + (540 - number_width) / 2, 210),
-          number, font=number_font, fill="white")
+# Center number horizontally near the bottom
+bounds = draw.textbbox(
+    (0, 0),
+    number,
+    font=number_font,
+    stroke_width=9
+)
 
-draw.text((645, 455), "CAREER LOSSES",
-          font=subtitle, fill="white")
+text_width = bounds[2] - bounds[0]
+text_height = bounds[3] - bounds[1]
 
-draw.text((645, 505), "AT CLEMSON",
-          font=subtitle, fill="white")
+x = (width - text_width) // 2 - bounds[0]
+y = height - text_height - 45 - bounds[1]
 
-canvas.save("test_graphic.png")
+draw.text(
+    (x, y),
+    number,
+    font=number_font,
+    fill="white",
+    stroke_width=9,
+    stroke_fill="black"
+)
 
-print("Graphic successfully created!")
+canvas.save("test_graphic.png", quality=95)
+
+print("Minimal Brownell graphic generated!")
